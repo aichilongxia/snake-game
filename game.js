@@ -11,6 +11,7 @@
   const overlayTextEl = document.getElementById('overlayText');
   const restartBtn = document.getElementById('restartBtn');
   const wrapToggle = document.getElementById('wrapToggle');
+  const difficultyEl = document.getElementById('difficulty');
   const pauseBtn = document.getElementById('pauseBtn');
 
   /**
@@ -115,6 +116,13 @@
   let gameOver;
   let tickMs;
   let lastTickAt;
+  let difficulty;
+
+  const DIFFICULTY = {
+    easy: { label: '易', baseTickMs: 140, minTickMs: 80, accelPerScoreMs: 1 },
+    normal: { label: '中', baseTickMs: 110, minTickMs: 55, accelPerScoreMs: 2 },
+    hard: { label: '难', baseTickMs: 85, minTickMs: 40, accelPerScoreMs: 3 },
+  };
 
   function loadBest() {
     try {
@@ -148,6 +156,37 @@
     pauseBtn.textContent = running ? '暂停' : '继续';
   }
 
+  function loadDifficulty() {
+    try {
+      const raw = localStorage.getItem('snake.diff');
+      return raw && DIFFICULTY[raw] ? raw : 'normal';
+    } catch {
+      return 'normal';
+    }
+  }
+
+  function saveDifficulty(value) {
+    try {
+      localStorage.setItem('snake.diff', value);
+    } catch {
+      // ignore
+    }
+  }
+
+  function applyDifficulty(value, { resyncTick = true } = {}) {
+    difficulty = DIFFICULTY[value] ? value : 'normal';
+    if (difficultyEl) difficultyEl.value = difficulty;
+    saveDifficulty(difficulty);
+
+    if (resyncTick) {
+      // Recompute tick based on current score.
+      const cfg = DIFFICULTY[difficulty];
+      const target = cfg.baseTickMs - Math.min(cfg.baseTickMs - cfg.minTickMs, score * cfg.accelPerScoreMs);
+      tickMs = Math.max(cfg.minTickMs, target);
+      lastTickAt = performance.now();
+    }
+  }
+
   function resetGame() {
     const mid = Math.floor(GRID / 2);
     snake = [
@@ -162,7 +201,8 @@
     running = true;
     gameOver = false;
 
-    tickMs = 110; // base speed
+    const cfg = DIFFICULTY[difficulty] || DIFFICULTY.normal;
+    tickMs = cfg.baseTickMs;
     lastTickAt = performance.now();
 
     scoreEl.textContent = String(score);
@@ -179,9 +219,9 @@
   }
 
   function maybeSpeedUp() {
-    // Slightly speed up as score increases; keep it simple.
-    const target = 110 - Math.min(50, score * 2);
-    tickMs = Math.max(55, target);
+    const cfg = DIFFICULTY[difficulty] || DIFFICULTY.normal;
+    const target = cfg.baseTickMs - Math.min(cfg.baseTickMs - cfg.minTickMs, score * cfg.accelPerScoreMs);
+    tickMs = Math.max(cfg.minTickMs, target);
   }
 
   function step() {
@@ -401,9 +441,20 @@
     });
   })();
 
+  // Persist difficulty choice
+  (function initDifficulty() {
+    applyDifficulty(loadDifficulty(), { resyncTick: false });
+    if (!difficultyEl) return;
+    difficultyEl.addEventListener('change', () => {
+      applyDifficulty(difficultyEl.value);
+    });
+  })();
+
   // Init
   best = loadBest();
   bestEl.textContent = String(best);
+  // ensure difficulty has a value if initDifficulty didn't run for any reason
+  if (!difficulty) applyDifficulty(loadDifficulty(), { resyncTick: false });
   resetGame();
   requestAnimationFrame(frame);
 })();

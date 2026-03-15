@@ -129,6 +129,15 @@ body {
   user-select: none;
 }
 
+.select {
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid currentColor;
+  background: Canvas;
+  color: CanvasText;
+}
+
 .pad {
   display: grid;
   gap: 10px;
