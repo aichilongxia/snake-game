@@ -93,6 +93,10 @@ body {
   background: color-mix(in srgb, Canvas 85%, transparent);
 }
 
+.overlay[hidden] {
+  display: none;
+}
+
 .overlayCard {
   width: min(360px, 92%);
   border: 1px solid currentColor;
