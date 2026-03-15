@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Snake Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app" aria-label="Snake Game">
+    <header class="top">
+      <div class="title">
+        <h1>贪吃蛇</h1>
+        <p class="hint">键盘：方向键 / WASD；手机：点击方向键；空格暂停</p>
+      </div>
+
+      <div class="stats" aria-label="Game stats">
+        <div class="stat">
+          <span class="label">分数</span>
+          <span class="value" id="score">0</span>
+        </div>
+        <div class="stat">
+          <span class="label">最高</span>
+          <span class="value" id="best">0</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="boardWrap">
+      <canvas id="board" class="board" width="480" height="480" aria-label="Game board" role="img"></canvas>
+      <div class="overlay" id="overlay" aria-live="polite" hidden>
+        <div class="overlayCard">
+          <h2 id="overlayTitle">Game Over</h2>
+          <p id="overlayText">按 Enter 或点击按钮重新开始</p>
+          <button id="restartBtn" class="btn">重新开始</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Controls">
+      <label class="toggle">
+        <input id="wrapToggle" type="checkbox" />
+        <span>穿墙模式</span>
+      </label>
+
+      <div class="pad" aria-label="Touch pad">
+        <button class="padBtn" data-dir="up" aria-label="Up">▲</button>
+        <div class="padRow">
+          <button class="padBtn" data-dir="left" aria-label="Left">◀</button>
+          <button class="padBtn" data-dir="down" aria-label="Down">▼</button>
+          <button class="padBtn" data-dir="right" aria-label="Right">▶</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="pauseBtn" class="btnSecondary">暂停</button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>提示：吃到食物加分，撞到自己会结束。</p>
+    </footer>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
