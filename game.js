@@ -232,7 +232,8 @@
     const styles = getComputedStyle(document.documentElement);
     const bg = styles.getPropertyValue('--board-bg').trim() || 'Canvas';
     const fg = styles.getPropertyValue('--board-fg').trim() || 'CanvasText';
-    const accent = styles.getPropertyValue('--board-accent').trim() || 'AccentColor';
+    const snakeColor = styles.getPropertyValue('--snake-color').trim() || fg;
+    const foodColor = styles.getPropertyValue('--food-color').trim() || '#ef4444';
 
     // Clear
     ctx.fillStyle = bg;
@@ -262,11 +263,27 @@
     ctx.restore();
 
     // Food
-    ctx.fillStyle = accent;
-    ctx.fillRect(ox + food.x * cs + 2, oy + food.y * cs + 2, cs - 4, cs - 4);
+    ctx.fillStyle = foodColor;
+    {
+      const x0 = ox + food.x * cs + 3;
+      const y0 = oy + food.y * cs + 4;
+      const w = cs - 6;
+      const h = cs - 8;
+      const x = x0;
+      const y = y0;
+      const topCurveHeight = h * 0.35;
+
+      // Heart path
+      ctx.beginPath();
+      ctx.moveTo(x + w / 2, y + h);
+      ctx.bezierCurveTo(x + w / 2 + w * 0.55, y + h * 0.75, x + w, y + topCurveHeight, x + w / 2, y + topCurveHeight);
+      ctx.bezierCurveTo(x, y + topCurveHeight, x + w / 2 - w * 0.55, y + h * 0.75, x + w / 2, y + h);
+      ctx.closePath();
+      ctx.fill();
+    }
 
     // Snake
-    ctx.fillStyle = fg;
+    ctx.fillStyle = snakeColor;
     for (let i = 0; i < snake.length; i++) {
       const p = snake[i];
       ctx.fillRect(ox + p.x * cs + 2, oy + p.y * cs + 2, cs - 4, cs - 4);
